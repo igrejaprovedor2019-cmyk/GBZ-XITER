@@ -23,12 +23,12 @@ client.once('clientReady', () => {
   console.log(`🔥 Bot online como ${client.user.tag}`);
 });
 
-// COMANDO !gbzstar
+// COMANDO
 client.on('messageCreate', async (message) => {
 
   if (message.author.bot) return;
 
-  if (message.content === '!gbzstar') {
+  if (message.content === '!gbzxit') {
 
     const embed = new EmbedBuilder()
       .setTitle('🔥😈 Adquira seu Painel FFH4X ANDROID 😈🔥')
@@ -160,7 +160,7 @@ client.on('interactionCreate', async (interaction) => {
     });
   }
 
-  // CONFIRMAR PAGAMENTO (COM DEBUG)
+  // CONFIRMAR PAGAMENTO + FECHAR EM 10s
   if (interaction.isButton() && interaction.customId === 'confirmar_pagamento') {
 
     const dono = process.env.DONO_ID;
@@ -179,13 +179,17 @@ Dono ID: ${dono}`,
 ✅ Pagamento confirmado!
 
 📦 Envie a key ao cliente no privado.
-🎉 Obrigado pela compra!
+⏳ Este ticket será fechado em 10 segundos...
     `);
 
     await interaction.reply({
       content: '✔️ Confirmado!',
       ephemeral: true
     });
+
+    setTimeout(() => {
+      interaction.channel.delete().catch(() => {});
+    }, 10000);
   }
 
 });
