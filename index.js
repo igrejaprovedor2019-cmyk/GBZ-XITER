@@ -28,7 +28,7 @@ client.on('messageCreate', async (message) => {
 
   if (message.author.bot) return;
 
-  if (message.content === '!gbzxit') {
+  if (message.content === '!gbzstar') {
 
     const embed = new EmbedBuilder()
       .setTitle('🔥😈 Adquira seu Painel FFH4X ANDROID 😈🔥')
@@ -37,39 +37,38 @@ client.on('messageCreate', async (message) => {
 
 🔥 **FFH4X RAGE ANDROID!**  
 
-Se você quer xitar com qualidade e ter resultado, o nosso painel foi feito pra você.  
+Se você quer qualidade e resultado, esse painel é pra você.  
 
-💎 Produto desenvolvido para entregar eficiência máxima e uma experiência diferenciada.  
+💎 Experiência diferenciada e máxima eficiência  
 
-🔥 **O que ele tem?**  
-• Aimbot Full - Configurável  
-• ESPs Full - Configurável  
-• AimBot - Configurável  
-• Puxa para cabeça, pescoço e peito  
+🔥 **O que tem:**  
+• Aimbot Full  
+• ESPs Full  
+• Configurável  
+• Head / Neck / Chest  
 
 💥 **Diferenciais**  
-• Funciona em todas versões do Android 🚀  
-• Tutorial e suporte para instalação  
+• Funciona em todos Android 🚀  
+• Suporte + Tutorial  
 
-🎮 **Ideal para quem quer:**  
-• Jogar AP ✅  
-• Jogar modo rank ✅  
-• Jogar CS rank ✅  
+🎮 **Ideal para:**  
+• Rank  
+• CS  
+• Jogar AP  
 
-📥 **O que você recebe:**  
-• Uma Key no privado  
-• Acesso a canais de tutorial e download  
+📥 **Você recebe:**  
+• Key no privado  
+• Acesso a downloads  
 
-🚨 Painel Rage, ou seja, há risco de blacklist  
+🚨 Pode haver risco de blacklist  
 
-📦 Entrega rápida no privado  
+📦 Entrega rápida  
 📲 Suporte antes da compra  
 
-😈🔥 **Não perde tempo… garante o seu agora!** 🔥😈
+😈🔥 **Garanta o seu agora!**
       `)
       .setImage('https://media.discordapp.net/attachments/1482528899903782932/1484254280088027216/file_000000008530720eb8922a615208f883.png')
-      .setColor(0x00ff88)
-      .setFooter({ text: 'GBZ STORE 🔥' });
+      .setColor(0x00ff88);
 
     const botao = new ButtonBuilder()
       .setCustomId('abrir_ticket')
@@ -88,7 +87,7 @@ Se você quer xitar com qualidade e ter resultado, o nosso painel foi feito pra 
 // INTERAÇÕES
 client.on('interactionCreate', async (interaction) => {
 
-  // BOTÃO
+  // BOTÃO COMPRAR
   if (interaction.isButton() && interaction.customId === 'abrir_ticket') {
 
     const select = new StringSelectMenuBuilder()
@@ -128,12 +127,17 @@ client.on('interactionCreate', async (interaction) => {
       ]
     });
 
-    const botaoConfirmar = new ButtonBuilder()
+    const confirmar = new ButtonBuilder()
       .setCustomId('confirmar_pagamento')
       .setLabel('Confirmar Pagamento')
       .setStyle(ButtonStyle.Success);
 
-    const row = new ActionRowBuilder().addComponents(botaoConfirmar);
+    const fechar = new ButtonBuilder()
+      .setCustomId('fechar_ticket')
+      .setLabel('Fechar Ticket')
+      .setStyle(ButtonStyle.Danger);
+
+    const row = new ActionRowBuilder().addComponents(confirmar, fechar);
 
     const embedPix = new EmbedBuilder()
       .setTitle('💰 Pagamento via PIX')
@@ -145,7 +149,6 @@ client.on('interactionCreate', async (interaction) => {
 
 📌 Após pagar, aguarde confirmação do dono
       `)
-      .setImage('https://media.discordapp.net/attachments/1482528899903782932/1484254280088027216/file_000000008530720eb8922a615208f883.png')
       .setColor(0x00ff88);
 
     await canal.send({
@@ -160,17 +163,14 @@ client.on('interactionCreate', async (interaction) => {
     });
   }
 
-  // CONFIRMAR PAGAMENTO + FECHAR EM 10s
+  // CONFIRMAR PAGAMENTO
   if (interaction.isButton() && interaction.customId === 'confirmar_pagamento') {
 
     const dono = process.env.DONO_ID;
 
     if (interaction.user.id != dono) {
       return interaction.reply({
-        content: `❌ Apenas o dono pode confirmar!
-
-Seu ID: ${interaction.user.id}
-Dono ID: ${dono}`,
+        content: '❌ Apenas o dono pode confirmar!',
         ephemeral: true
       });
     }
@@ -178,21 +178,38 @@ Dono ID: ${dono}`,
     await interaction.channel.send(`
 ✅ Pagamento confirmado!
 
-📦 Envie a key ao cliente no privado.
-⏳ Este ticket será fechado em 10 segundos...
+📦 Sua key será enviada aqui assim que o dono estiver online.
+⏳ Aguarde...
     `);
 
     await interaction.reply({
       content: '✔️ Confirmado!',
       ephemeral: true
     });
+  }
+
+  // FECHAR TICKET
+  if (interaction.isButton() && interaction.customId === 'fechar_ticket') {
+
+    const dono = process.env.DONO_ID;
+
+    if (interaction.user.id != dono) {
+      return interaction.reply({
+        content: '❌ Apenas o dono pode fechar!',
+        ephemeral: true
+      });
+    }
+
+    await interaction.reply({
+      content: '🗑️ Fechando ticket...',
+      ephemeral: true
+    });
 
     setTimeout(() => {
       interaction.channel.delete().catch(() => {});
-    }, 10000);
+    }, 2000);
   }
 
 });
 
-// LOGIN
 client.login(process.env.TOKEN);
