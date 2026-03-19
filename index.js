@@ -95,10 +95,10 @@ client.on('interactionCreate', async (interaction) => {
       .setCustomId('produto')
       .setPlaceholder('Escolha seu plano')
       .addOptions([
-        { label: 'Android - 1 dia', description: 'R$17,90', value: '17.90' },
-        { label: 'Android - 7 dias', description: 'R$25,90', value: '25.90' },
-        { label: 'Android - 10 dias', description: 'R$35,90', value: '35.90' },
-        { label: 'Android - 30 dias', description: 'R$55,90', value: '55.90' }
+        { label: '1 dia', description: 'R$17,90', value: '17.90' },
+        { label: '7 dias', description: 'R$25,90', value: '25.90' },
+        { label: '10 dias', description: 'R$35,90', value: '35.90' },
+        { label: '30 dias', description: 'R$55,90', value: '55.90' }
       ]);
 
     return interaction.reply({
@@ -141,7 +141,7 @@ client.on('interactionCreate', async (interaction) => {
 💵 Valor: R$${valor}
 
 📲 Chave PIX:
-${process.env.PIX}
+21983873874
 
 📌 Após pagar, aguarde confirmação do dono
       `)
@@ -160,12 +160,17 @@ ${process.env.PIX}
     });
   }
 
-  // CONFIRMAR PAGAMENTO
+  // CONFIRMAR PAGAMENTO (COM DEBUG)
   if (interaction.isButton() && interaction.customId === 'confirmar_pagamento') {
 
-    if (interaction.user.id !== process.env.DONO_ID) {
+    const dono = process.env.DONO_ID;
+
+    if (interaction.user.id != dono) {
       return interaction.reply({
-        content: '❌ Apenas o dono pode confirmar!',
+        content: `❌ Apenas o dono pode confirmar!
+
+Seu ID: ${interaction.user.id}
+Dono ID: ${dono}`,
         ephemeral: true
       });
     }
