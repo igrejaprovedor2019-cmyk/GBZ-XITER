@@ -4,45 +4,67 @@ const {
   Client, GatewayIntentBits,
   ActionRowBuilder, ButtonBuilder, ButtonStyle,
   StringSelectMenuBuilder, ChannelType,
-  PermissionsBitField, EmbedBuilder
+  PermissionsBitField, EmbedBuilder,
+  REST, Routes, SlashCommandBuilder
 } = require('discord.js');
 
 const client = new Client({
-  intents: [
-    GatewayIntentBits.Guilds
-  ]
+  intents: [GatewayIntentBits.Guilds]
 });
 
-client.once('clientReady', async () => {
+const commands = [
+  new SlashCommandBuilder()
+    .setName('gbzstar')
+    .setDescription('Enviar painel de compras')
+].map(cmd => cmd.toJSON());
+
+// REGISTRAR COMANDO
+const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
+
+(async () => {
+  try {
+    await rest.put(
+      Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID),
+      { body: commands }
+    );
+    console.log('✅ Comando /gbzstar registrado');
+  } catch (error) {
+    console.error(error);
+  }
+})();
+
+client.once('clientReady', () => {
   console.log(`🔥 Bot online como ${client.user.tag}`);
-
-  // 🔥 ENVIA O PAINEL AUTOMÁTICO
-  const canal = client.channels.cache.get('COLOQUE_ID_DO_CANAL_AQUI');
-
-  if (!canal) return console.log('Canal não encontrado');
-
-  const embed = new EmbedBuilder()
-    .setTitle('🔥😈 Adquira seu Painel ANDROID 😈🔥')
-    .setDescription('💎 Clique abaixo para comprar')
-    .setImage('https://media.discordapp.net/attachments/1482528899903782932/1484254280088027216/file_000000008530720eb8922a615208f883.png')
-    .setColor(0x00ff88);
-
-  const botao = new ButtonBuilder()
-    .setCustomId('abrir_ticket')
-    .setLabel('Comprar Agora')
-    .setStyle(ButtonStyle.Success);
-
-  const row = new ActionRowBuilder().addComponents(botao);
-
-  canal.send({
-    embeds: [embed],
-    components: [row]
-  });
 });
 
-// ================= INTERAÇÕES =================
+// INTERAÇÕES
 client.on('interactionCreate', async (interaction) => {
 
+  // COMANDO /GBZSTAR
+  if (interaction.isChatInputCommand()) {
+    if (interaction.commandName === 'gbzstar') {
+
+      const embed = new EmbedBuilder()
+        .setTitle('🔥😈 Adquira seu Painel ANDROID 😈🔥')
+        .setDescription('💎 Clique abaixo para comprar')
+        .setImage('https://media.discordapp.net/attachments/1482528899903782932/1484254280088027216/file_000000008530720eb8922a615208f883.png')
+        .setColor(0x00ff88);
+
+      const botao = new ButtonBuilder()
+        .setCustomId('abrir_ticket')
+        .setLabel('Comprar Agora')
+        .setStyle(ButtonStyle.Success);
+
+      const row = new ActionRowBuilder().addComponents(botao);
+
+      await interaction.reply({
+        embeds: [embed],
+        components: [row]
+      });
+    }
+  }
+
+  // BOTÃO
   if (interaction.isButton() && interaction.customId === 'abrir_ticket') {
 
     const select = new StringSelectMenuBuilder()
@@ -62,6 +84,7 @@ client.on('interactionCreate', async (interaction) => {
     });
   }
 
+  // CRIAR TICKET
   if (interaction.isStringSelectMenu()) {
 
     const valor = interaction.values[0];
@@ -105,6 +128,7 @@ client.on('interactionCreate', async (interaction) => {
     });
   }
 
+  // CONFIRMAR PAGAMENTO
   if (interaction.isButton() && interaction.customId === 'confirmar_pagamento') {
 
     if (interaction.user.id !== process.env.DONO_ID) {
